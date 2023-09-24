@@ -18,10 +18,7 @@ setup(
     license="MIT",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    version=open(THISDIR / "blendtorch" / "btb" / "__init__.py")
-    .readlines()[-1]
-    .split()[-1]
-    .strip("'"),
+    version="0.4.0",
     packages=["blendtorch.btb"],
     install_requires=required,
     zip_safe=False,
