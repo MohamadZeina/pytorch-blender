@@ -1,6 +1,8 @@
 import subprocess
 import os
 import logging
+import socket
+import random
 import numpy as np
 import psutil
 import signal
@@ -200,14 +202,48 @@ class BlenderLauncher:
         else:
             logger.info("Blender instances closed")
 
-    def _address_generator(self, proto, bind_addr, start_port):
-        """Convenience to generate addresses."""
+    # # Old
+    # def _address_generator(self, proto, bind_addr, start_port):
+    #     """Convenience to generate addresses."""
+    #     if bind_addr == "primaryip":
+    #         bind_addr = get_primary_ip()
+    #     nextport = start_port
+    #     while True:
+    #         addr = f"{proto}://{bind_addr}:{nextport}"
+    #         nextport += 1
+    #         yield addr
+
+    def _is_port_available(self, port, bind_addr):
+        """Check if a port is available."""
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            try:
+                s.bind((bind_addr, port))
+                return True
+            except socket.error:
+                return False
+
+    # def _address_generator(self, proto, bind_addr, start_port):
+    #     """Convenience to generate addresses with dynamic port selection."""
+    #     if bind_addr == "primaryip":
+    #         bind_addr = get_primary_ip()
+    #     nextport = start_port
+    #     while True:
+    #         while not self._is_port_available(nextport, bind_addr):
+    #             nextport += 1
+    #         addr = f"{proto}://{bind_addr}:{nextport}"
+    #         nextport += 1
+    #         yield addr
+
+    def _address_generator(self, proto, bind_addr, start_port=1025, end_port=30000):
+        """Convenience to generate addresses with random port selection."""
         if bind_addr == "primaryip":
             bind_addr = get_primary_ip()
-        nextport = start_port
+
         while True:
+            nextport = random.randint(start_port, end_port)
+            while not self._is_port_available(nextport, bind_addr):
+                nextport = random.randint(start_port, end_port)
             addr = f"{proto}://{bind_addr}:{nextport}"
-            nextport += 1
             yield addr
 
     def _poll(self):

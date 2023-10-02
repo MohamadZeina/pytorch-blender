@@ -286,7 +286,7 @@ try:
 
         def seed(self, seed):
             """'Sets the seed for this env's random number generator(s)."""
-            raise NotImplementedError()
+            # raise NotImplementedError()
 
         def render(self, mode="human"):
             """Renders the environment.
